@@ -194,6 +194,9 @@ def run() -> None:
         APPLY_MOTION = True if motion_arg == "apply" else False
         MIN_DURATION_FOR_PREPROCESSING = args.static_min_duration_for_preprocessing or args.min_duration_for_preprocessing
 
+    if APPLY_MOTION and not COMPUTE_MOTION:
+        raise ValueError("Applying motion correction requires motion_correction.compute=True")
+
     # TODO: temporary - remove from params.json when logging is distributed by pipeline
     LOGGING = preprocessing_params.get("logging", None)
 
@@ -569,7 +572,9 @@ def run() -> None:
                             select_kwargs=select_kwargs,
                             localize_peaks_kwargs=localize_peaks_kwargs,
                             estimate_motion_kwargs=estimate_motion_kwargs,
-                            raise_error=False
+                            # Applied correction is required by downstream sorters that disable
+                            # their own drift correction. Do not silently sort uncorrected data.
+                            raise_error=motion_params["apply"]
                         )
                         if motion is not None:
                             logging.info(f"\tMotion computed successfully!")
@@ -637,8 +642,19 @@ def run() -> None:
                                     binary_output_filename,
                                     relative_to=results_folder
                                 )
+                                # Postprocessing also saves this extractor in the analyzer, and
+                                # the result collector publishes it for visualization and QC.
+                                # Keep it consistent with the binary used for spike sorting.
+                                dump_to_json_or_pickle(
+                                    recording_bin,
+                                    results_folder,
+                                    preprocessing_output_filename,
+                                    relative_to=results_folder
+                                )
                                 preprocessing_notes += "\n- Motion correction applied to the preprocessed traces.\n"
                         else:
+                            if motion_params["apply"]:
+                                raise RuntimeError(f"Motion correction was requested but no motion was estimated for {recording_name}")
                             logging.info(f"\tMotion computation failed. Skipping motion correction")
                             preprocessing_notes += "\n- Motion computation failed. Skipping motion correction.\n"
 
