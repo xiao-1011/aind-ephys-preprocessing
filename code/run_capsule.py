@@ -613,10 +613,31 @@ def run() -> None:
 
                             if motion_params["apply"]:
                                 recording_processed = recording_corrected
-                                recording_bin = recording_bin_corrected
                                 # if motion is applied, the recording is no longer json serializable since
                                 # it contains the motion object which is not json serializable
                                 visualization_file_is_json_serializable = False
+
+                                # Downstream steps (spike sorting, postprocessing, ...) only read the
+                                # binary_{recording_name} file, so the corrected traces have to be written
+                                # to disk: replace the uncorrected binary folder with the corrected one
+                                # and re-dump the binary JSON/pickle.
+                                logging.info(f"\tSaving motion-corrected traces to binary")
+                                corrected_output_folder = preprocessing_output_folder.parent / (
+                                    f"{preprocessing_output_folder.name}_motioncorrected"
+                                )
+                                recording_bin_corrected = recording_bin_corrected.save(
+                                    folder=corrected_output_folder, dtype=recording_bin.get_dtype()
+                                )
+                                shutil.rmtree(preprocessing_output_folder)
+                                corrected_output_folder.rename(preprocessing_output_folder)
+                                recording_bin = si.load(preprocessing_output_folder)
+                                dump_to_json_or_pickle(
+                                    recording_bin,
+                                    results_folder,
+                                    binary_output_filename,
+                                    relative_to=results_folder
+                                )
+                                preprocessing_notes += "\n- Motion correction applied to the preprocessed traces.\n"
                         else:
                             logging.info(f"\tMotion computation failed. Skipping motion correction")
                             preprocessing_notes += "\n- Motion computation failed. Skipping motion correction.\n"
