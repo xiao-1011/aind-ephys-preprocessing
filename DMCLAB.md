@@ -25,6 +25,7 @@ No other branches are kept. Upstream development branches live upstream.
 | Tag | Commit | Upstream base | Used by |
 |---|---|---|---|
 | `dmclab-1.4.0-v2` | `194532b` | `4e86c7f` (pipeline 1.4.0) | DREDGE-100 v1 (`batch_runs/20261006_180017`) and v2 (`batch_runs/20261012_125513`) |
+| `dmclab-1.4.0-v3` | `939d3c4` | `4e86c7f` (pipeline 1.4.0) | DREDGE-100 v3 (not yet in production) |
 
 Tags are never moved or deleted: archived runs refer to these commits.
 
@@ -37,7 +38,7 @@ Tags are never moved or deleted: archived runs refer to these commits.
    uncorrected data (`raise_error` when applying, error if apply without compute
    or if no motion is estimated), and re-dump the preprocessed recording JSON so
    postprocessing/visualization use the same corrected binary as the sorter.
-3. Optional seeded noise estimate for motion. `compute_motion()` detects peaks
+3. `939d3c4` Optional seeded noise estimate for motion. `compute_motion()` detects peaks
    with `get_noise_levels()` on unseeded random chunks, so motion (and the
    sort) changed from run to run. With
    `motion_correction.noise_levels.random_slices_kwargs` set, the estimate is
