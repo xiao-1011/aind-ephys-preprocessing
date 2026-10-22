@@ -37,6 +37,14 @@ Tags are never moved or deleted: archived runs refer to these commits.
    uncorrected data (`raise_error` when applying, error if apply without compute
    or if no motion is estimated), and re-dump the preprocessed recording JSON so
    postprocessing/visualization use the same corrected binary as the sorter.
+3. Optional seeded noise estimate for motion. `compute_motion()` detects peaks
+   with `get_noise_levels()` on unseeded random chunks, so motion (and the
+   sort) changed from run to run. With
+   `motion_correction.noise_levels.random_slices_kwargs` set, the estimate is
+   computed with that seed and cached before `compute_motion()`. Without the
+   key, behaviour is unchanged. DREDGE-100 v3 uses
+   `{"num_chunks_per_segment": 400, "chunk_duration": "500ms", "seed": 0}`
+   (noise-chunk pilot, `maintenance/noise_chunks_3sessions_20261020_135231`).
 
 Not yet submitted upstream. Upstream `319079d` (pipeline 1.4.1) does not contain
 an equivalent fix.

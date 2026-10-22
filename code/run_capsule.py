@@ -563,6 +563,22 @@ def run() -> None:
                             recording_bin_c = recording_bin
                             recording_processed_c = recording_processed
 
+                        # compute_motion() detects peaks with the cached raw MAD noise levels and, if none are
+                        # cached, draws unseeded random chunks. Caching a seeded estimate makes motion reproducible.
+                        noise_levels_params = motion_params.get("noise_levels", None)
+                        if noise_levels_params is not None:
+                            random_slices_kwargs = noise_levels_params.get("random_slices_kwargs", {})
+                            if random_slices_kwargs.get("seed") is None:
+                                raise ValueError("motion_correction.noise_levels.random_slices_kwargs.seed is required")
+                            si.get_noise_levels(
+                                recording_bin_c,
+                                return_in_uV=False,
+                                method="mad",
+                                force_recompute=True,
+                                random_slices_kwargs=random_slices_kwargs,
+                            )
+                            logging.info(f"\t\tUsing seeded motion noise levels: {random_slices_kwargs}")
+
                         # use compute motion
                         motion = spre.compute_motion(
                             recording_bin_c,
