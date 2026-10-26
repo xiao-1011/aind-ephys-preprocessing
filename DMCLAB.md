@@ -25,7 +25,7 @@ No other branches are kept. Upstream development branches live upstream.
 | Tag | Commit | Upstream base | Used by |
 |---|---|---|---|
 | `dmclab-1.4.0-v2` | `194532b` | `4e86c7f` (pipeline 1.4.0) | DREDGE-100 v1 (`batch_runs/20261006_180017`) and v2 (`batch_runs/20261012_125513`) |
-| `dmclab-1.4.0-v3` | `939d3c4` | `4e86c7f` (pipeline 1.4.0) | DREDGE-100 v3 (not yet in production) |
+| `dmclab-1.4.0-v3` | `939d3c4` | `4e86c7f` (pipeline 1.4.0) | DREDGE-100 v3 (pipeline `main` `128c44d`, `session_archives/dredge100_v3`) |
 
 Tags are never moved or deleted: archived runs refer to these commits.
 
